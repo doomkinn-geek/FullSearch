@@ -53,5 +53,20 @@ namespace FullSearch.Services.Impl
                 }
             }
         }
+        public IEnumerable<string> Search(string word, string item)
+        {
+            int pos = 0;
+            while (true)
+            {
+                pos = item.IndexOf(word, pos);
+                if (pos >= 0)
+                {
+                    yield return PrettyMatchV3(item, pos);
+                }
+                else
+                    break;
+                pos++;
+            }
+        }
     }
 }

@@ -25,8 +25,46 @@ namespace FullSearch
                 })
                 .Build();
 
-            FullTextIndexV1 fullTextIndexV1 = new FullTextIndexV1(host.Services.GetService<DocumentDbContext>());
-            fullTextIndexV1.BuildIndex();
+            //FullTextIndexV1 fullTextIndexV1 = new FullTextIndexV1(host.Services.GetService<DocumentDbContext>());
+            //fullTextIndexV1.BuildIndex();
+
+            BenchmarkSwitcher.FromAssembly(typeof(Sample3).Assembly).Run(args, new BenchmarkDotNet.Configs.DebugInProcessConfig());
+            BenchmarkRunner.Run<SearchBenchmarkV2>();
         }
+    }
+
+    [MemoryDiagnoser]
+    [WarmupCount(1)]
+    [IterationCount(5)]
+    public class SearchBenchmarkV2
+    {
+
+        private readonly FullTextIndexV3 _index;
+        private readonly string[] _documentsSet;
+
+        [Params("intercontinental", "monday", "not")]
+        public string Query { get; set; }
+
+        public SearchBenchmarkV2()
+        {
+            _documentsSet = DocumentExtractor.DocumentsSet().Take(10000).ToArray();
+            _index = new FullTextIndexV3();
+            foreach (var item in _documentsSet)
+                _index.AddStringToIndex(item);
+
+        }
+
+        [Benchmark(Baseline = true)]
+        public void SimpleSearch()
+        {
+            new SimpleSearcherV3().SearchV3Enumerable(Query, _documentsSet).ToArray();
+        }
+
+        [Benchmark]
+        public void FullTextIndexSearch()
+        {
+            _index.SearchTest(Query).ToArray();
+        }
+
     }
 }
