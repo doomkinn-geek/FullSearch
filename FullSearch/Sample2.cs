@@ -25,7 +25,8 @@ namespace FullSearch
 
             var documentsSet = DocumentExtractor.DocumentsSet().Take(10000).ToArray();
             //new SimpleSearcher().Search("Monday", documentsSet);
-            new SimpleSearcherV2().SearchV1("Monday", documentsSet);
+            //new SimpleSearcherV2().SearchV1("Monday", documentsSet);
+            new SimpleSearcherV3().SearchV3("Monday", documentsSet);
         }
     }
 }
